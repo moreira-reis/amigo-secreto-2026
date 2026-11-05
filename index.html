@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12382f">
+  <title>Amigo Secreto 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--green:#12382f;--green2:#1c5142;--gold:#e8c985;--cream:#fffaf0;--ink:#26332e}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 10%,#315d48 0,transparent 28%),linear-gradient(145deg,#0d2923,#174536 55%,#0b211c);display:grid;place-items:center;padding:24px}
+    .card{width:min(100%,520px);background:var(--cream);border:1px solid #e8d9b6;border-radius:26px;padding:34px 26px;text-align:center;box-shadow:0 24px 70px #0005;position:relative;overflow:hidden}
+    .card:before,.card:after{content:"✦";position:absolute;color:#d6b56d;font-size:34px;opacity:.65}.card:before{top:15px;left:18px}.card:after{right:18px;bottom:12px}
+    .tree{font-size:42px;margin:4px 0 8px}
+    .eyebrow{letter-spacing:.22em;text-transform:uppercase;color:#8d7442;font-size:11px;font-weight:800}
+    h1{font-family:Georgia,serif;color:var(--green);font-size:clamp(34px,9vw,48px);line-height:1.05;margin:12px 0}
+    .sub{color:#64736b;line-height:1.55;margin:0 auto 24px;max-width:340px}
+    .divider{height:1px;background:#e8ddc7;margin:22px 0}
+    button{border:0;border-radius:999px;background:var(--green);color:white;font-weight:750;font-size:15px;padding:15px 24px;cursor:pointer;box-shadow:0 7px 18px #12382f2c}
+    button:disabled{opacity:.55;cursor:wait}
+    .result{display:none;margin:22px 0 4px;padding:20px 12px;border:1px dashed #c5a45c;border-radius:18px;background:#fffdf7}
+    .result small{display:block;color:#8d7442;text-transform:uppercase;letter-spacing:.15em;font-size:10px;font-weight:800}
+    .name{font-family:Georgia,serif;color:var(--green);font-size:clamp(30px,8vw,42px);font-weight:700;margin-top:8px;overflow-wrap:anywhere}
+    .message{min-height:24px;color:#64736b;font-size:13px;margin-top:18px}
+    footer{font-size:11px;color:#8a938d;margin-top:24px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="tree">🎄</div>
+    <div class="eyebrow">Uma surpresa especial</div>
+    <h1>Amigo Secreto<br>2026</h1>
+    <p class="sub">O seu presente começa com uma descoberta. Abra seu resultado e mantenha o segredo! 🤫</p>
+    <div class="divider"></div>
+    <button id="reveal" type="button">🎁 Revelar meu amigo secreto</button>
+    <section class="result" id="result" aria-live="polite">
+      <small>Você tirou</small>
+      <div class="name" id="recipient"></div>
+    </section>
+    <div class="message" id="message">Este link é pessoal. Não compartilhe com outras pessoas.</div>
+    <footer>Amigo Secreto 2026 · Feito para compartilhar carinho</footer>
+  </main>
+<script>
+(() => {
+  const SUPABASE_URL = "https://zhxurwfuuesoxeydztrl.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_h7k317jcMRb2f2nLv7cIqw_nLaXmRK0";
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+  const button = document.getElementById("reveal");
+  const message = document.getElementById("message");
+  const result = document.getElementById("result");
+  const recipient = document.getElementById("recipient");
+
+  if (!token) {
+    button.disabled = true;
+    message.textContent = "Link incompleto. Peça ao organizador o seu link individual.";
+    return;
+  }
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    button.textContent = "Abrindo seu presente…";
+    message.textContent = "Só um instante!";
+    try {
+      const { data, error } = await client.rpc("reveal_secret", { p_token: token });
+      if (error) throw error;
+      if (!data) {
+        message.textContent = "Não foi possível localizar este link. Confira se ele está completo.";
+        button.disabled = false;
+        button.textContent = "Tentar novamente";
+        return;
+      }
+      recipient.textContent = data;
+      result.style.display = "block";
+      message.textContent = "🤫 Guarde segredo! Não mostre esta tela aos outros participantes.";
+      button.textContent = "Seu amigo secreto foi revelado";
+    } catch (e) {
+      console.error(e);
+      message.textContent = "Não foi possível carregar o resultado. Tente novamente mais tarde.";
+      button.disabled = false;
+      button.textContent = "Tentar novamente";
+    }
+  });
+})();
+</script>
+</body>
+</html>
